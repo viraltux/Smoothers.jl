@@ -3,6 +3,9 @@ uuid = "012d725f-b4dd-4916-8440-03955fc52575"
 authors = ["Fran Urbano <viraltux@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+Dierckx = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
+
 [compat]
 julia = "1"
 

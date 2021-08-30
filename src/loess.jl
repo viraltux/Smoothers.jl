@@ -41,35 +41,41 @@ f = Smoothers.loess(x,y)
 """
 loess
 
-function loess(yv::AbstractVector{<:Union{Missing,S}};
+function loess(yv::AbstractVector{<:Union{Missing,T}};
                d::Integer=0, # 0 -> auto
-               q::Integer=3*sum((!ismissing).(yv))÷4,
-               rho::AbstractVector{<:Union{Missing,T}}=fill(1.0,length(yv)),
-               exact::AbstractVector{S}=S[]) where {S<:Real, T<:Real}
+               q::Integer=3*length(yv)÷4,
+               rho::AbstractVector{<:Union{Missing,T}}=fill(T(1),length(yv)),
+               exact::AbstractVector{T}=T[],
+               extra::AbstractVector{T}=T[]) where {T<:Real,S<:Real}
 
-    loess(S(1):length(yv),yv;d,q,rho,exact)
+    loess(T(1):length(yv),yv;d,q,rho,exact,extra)
 end
 
 function loess(xv::AbstractVector{R},
-               yv::AbstractVector{<:Union{Missing,S}};
-               d::Integer=0, # 0 -> auto
-               q::Integer=3*sum((!ismissing).(xv))÷4,
-               rho::AbstractVector{<:Union{Missing,T}}=fill(1.0,length(xv)),
-               exact::AbstractVector{R}=R[]) where {R<:Real, S<:Real, T<:Real}
-        
+               yv::AbstractVector{<:Union{Missing,T}};
+               d::Integer=0,
+               q::Integer=3*length(yv)÷4,
+               rho::AbstractVector{<:Union{Missing,T}}=fill(T(1),length(xv)),
+               exact::AbstractVector{R}=R[],
+               extra::AbstractVector{R}=R[]) where {R<:Real,T<:Real}
+
+    @assert issorted(xv) "xv values must be sorted"
     @assert d in 0:2 "Linear Regression must be of degree 1 or 2 or 0 (auto)"
-    @assert length(xv) == length(yv)
+    @assert length(xv) == length(yv) "xv and yv must have the same length"
 
     # Removing missing values
     myi = findall(x -> !ismissing(x),yv)
+    @assert length(myi) > 0 "at least one yv value must be non missing"
+    q = Int(floor(q*length(myi)/length(yv)))
     xv = xv[myi]
     yv = yv[myi]
     rho = rho[myi]
 
-    @assert 1<=q<=length(xv) "q should be smaller of equal to the number of non missing values in xv"
+    length(xv) == 1 && return x -> repeat([yv[1]],length(x))
+    length(xv) == 2 && begin d=(yv[2]-yv[1])/(xv[2]-xv[1]); return x -> @. d*x+(yv[1]-d*xv[1]) end
     
     # Promote to same type
-    P = promote_type(R,S,T)
+    P = promote_type(R,T)
     xv = R == P ? xv :  P.(xv)
     yv =  P.(yv)
     rho = P.(rho)
@@ -80,33 +86,40 @@ function loess(xv::AbstractVector{R},
     b = yv
 
     ## Order Estimation
-    k = khat(yv)
-    d = (d == 0) ? min(k,2) : 2  #loess accepts 1 or 2
+    d = (d == 0) ? min(khat(yv),2) : d  # loess accepts 1 or 2
     d == 2 && (A = hcat(xv .^ 2, A))
     
     # Select collection
-    n = max(sr(length(xv)),10)
-    m,M = extrema(xv)
-    gap = (M-m)/n
-    exact = vcat(exact, xv[Int64.(round.(LinRange(1,length(xv),10)))])
-    predict = sort(unique(vcat(collect(m:gap:M),M,exact)))
-    predictx = vcat(m-P(10)*gap,m-gap,m-P(0.1)*gap,
-                    predict,
-                    M+P(0.1)*gap,M+gap,M+P(10)*gap)
-
+    predictx = exact
+    if isempty(exact)
+        N = length(xv)
+        n = 2*sr(N)*N÷q
+        m,M = extrema(xv)
+        gap = (M-m)/n
+        #exact = vcat(exact, xv[Int64.(round.(LinRange(1,length(xv),20)))])
+        predict = sort(unique(vcat(collect(m:gap:M),M,extra)))
+        predictx = vcat(m-P(10)*gap,m-gap,m-P(.1)*gap,
+                        predict,
+                        M+P(.1)*gap,M+gap,M+P(10)*gap)
+    else
+        @assert length(exact) > d "length(exact) should be greater than d"
+    end
+    
     # Predict collection
     res = similar(predictx)
     for (i,xi) in enumerate(predictx)
         res[i] = ghat(xi;A,b,d,q,rho)
     end
-    Spline1D(predictx, res; k=d, bc="extrapolate", s=0)
+
+    Spline1D(predictx, res; k=d, bc="extrapolate",s=0)
+
 end
 
 # loess estimation
 function ghat(x::T;
               A::AbstractMatrix{T},
               b::AbstractVector{T},
-              d::Integer=2,
+              d::Integer,
               q::Integer,
               rho::AbstractVector{T}) where T<:Real
               
@@ -116,7 +129,7 @@ function ghat(x::T;
     ## λ_q
     n = length(xv)
     xvx = @. abs(xv-x)
-    qidx = sortperm(xvx)[1:q]
+    qidx = sortperm(xvx)[1:min(q,n)]
     qdist = abs(xv[last(qidx)]-x)*max(T(1),q/n)
 
     ## upsilon
@@ -131,7 +144,7 @@ function ghat(x::T;
 
     lsq_x = A\b
 
-    d == 1 ? [x,T(1)]'*lsq_x : [x^2,x,T(1)]'*lsq_x
+    d == 1 ? sum([x,T(1)].*lsq_x) : sum([x^2,x,T(1)].*lsq_x)
 
 end
 
