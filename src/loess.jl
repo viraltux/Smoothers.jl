@@ -76,6 +76,8 @@ function loess(xv::AbstractVector{R},
     
     # Promote to same type
     P = promote_type(R,T)
+    P = Base.promote_op(/,P,P)
+
     xv = R == P ? xv :  P.(xv)
     yv =  P.(yv)
     rho = P.(rho)
@@ -98,9 +100,9 @@ function loess(xv::AbstractVector{R},
         gap = (M-m)/n
         #exact = vcat(exact, xv[Int64.(round.(LinRange(1,length(xv),20)))])
         predict = sort(unique(vcat(collect(m:gap:M),M,extra)))
-        predictx = vcat(m-P(10)*gap,m-gap,m-P(.1)*gap,
+        predictx = vcat(m-P(10)*gap,m-gap,
                         predict,
-                        M+P(.1)*gap,M+gap,M+P(10)*gap)
+                        M+gap,M+P(10)*gap)
     else
         @assert length(exact) > d "length(exact) should be greater than d"
     end

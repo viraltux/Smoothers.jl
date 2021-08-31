@@ -2,9 +2,10 @@ module Smoothers
 
 using Dierckx
 
-export hma, loess, sma, stl
+export filter, hma, loess, sma, stl
 
 # Methods
+include("filter.jl")
 include("hma.jl")
 include("loess.jl")
 include("sma.jl")

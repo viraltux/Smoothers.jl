@@ -1,5 +1,5 @@
 """
-Package: Forecast
+Package: Smoothers
 
     stl(Yv, np; robust=false, 
                 nl=nextodd(np), 
@@ -10,7 +10,6 @@ Package: Forecast
                 spm=false,
                 qsmp=max(div(np,7),2),
                 cth = 0.01,
-                timestamp = nothing,
                 verbose=false)
 
 Decompose a time series into trend, seasonal, and remainder components.
@@ -21,9 +20,10 @@ All default values are chosen following the recommendations of the original pape
 
 for `no` the authors advise 5 ("safe value") or 10 ("near certainty of convergence") cycles  or a convergence criterion when robustness is required, in this case when `robust` is true computations stop when convergence is achieved in trend and seasonality.
 
-for `qsmp` the authors do not adivise a default but they use a value close to div(`np`,7).
+for `qsmp` the authors do not advise a default but they use a value close to div(`np`,7).
 
 # Arguments
+- `Yv`: Time series.
 - `np`: Seasonality.
 - `robust`: Robust stl.
 - `nl`: Smoothing parameter of the low-pass filter.
@@ -34,23 +34,22 @@ for `qsmp` the authors do not adivise a default but they use a value close to di
 - `spm`: Seasonal post-smoothing.
 - `qsmp`: Loess q window for Seasonal post-smoothing.
 - `cth`: Corvengence threshold for Seasonal and Trend.
-- `timestamp`: Timestamp to be used other than the default.
 - `verbose`: If true shows updates for the Seasonal and Trend convergence.
 
 # Returns
-An `STL` object with the seasonal, trend and remainder components.
+A three columns matrix with the Seasonal, Trend and Remainder values for Yv.
 
 * STL: A Seasonal, Trend Decomposition Procedure Based on Loess" Robert B. Cleveland, William S. Cleveland, Jean E. McRae, and Irma Terpenning. Journal of Official Statistics Vol. 6. No. 1, 1990, pp. 3-73 (c) Statistics Sweden.
 
             
 # Examples
 ```julia-repl
-julia> stl_co2 = stl(co2(),365; robust=true, spm=true)
-[ Info: Dataset used in Cleveland et al. paper
-[ Info: Corvengence achieved (< 0.01); Stopping computation...
-STL Object: stl(Yn, np=365; nl=365, ns=46091, nt=549, ni=1, no=0, spm=true, qsmp=52)
-
-julia> plot(stl_co2)
+x = stl(rand(100),10)
+100×3 Matrix{Float64}:
+  0.0659717   0.512964  -0.3029
+ -0.0822641   0.502129   0.0710054
+  0.217383    0.491153   0.145449
+[...]
 ```
 """
 function stl(Yv::AbstractVector{<:Union{Missing,T}},
@@ -185,7 +184,7 @@ function stl(Yv::AbstractVector{<:Union{Missing,T}},
 end
 
 """
-Package: Forecast
+Package: Smoothers
 
     nextodd(x)
 
@@ -193,5 +192,5 @@ Return the smallest odd integer greater than or equal to `x`.
 """
 function nextodd(x::Real)::Integer
     cx = Integer(ceil(x))
-    mod(cx,2)==0 ? cx+1 : cx
+    mod(cx,2) == 0 ? cx+1 : cx
 end
