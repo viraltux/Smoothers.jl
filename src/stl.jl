@@ -54,13 +54,13 @@ x = stl(rand(100),10)
 """
 function stl(Yv::AbstractVector{<:Union{Missing,T}},
              np::Integer;
-             robust=false,
+             robust=true,
              nl=nextodd(np),
              ns=7,
              nt=nextodd(1.5*np/(1-1.5/ns)),
              ni=robust ? 1 : 2,
              no=0,
-             spm=false,
+             spm=true,
              qsmp=max(div(np,7),2),
              cth = 0.01,
              verbose=false) where {T<:Real}
