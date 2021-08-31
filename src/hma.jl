@@ -108,8 +108,8 @@ julia> hma(rand(1000), BigInt(303)))
 function hma(s::AbstractArray{<:Real}, n::Integer)
 
     @assert isodd(n) "n must be odd"
-    @assert n >= 5 "n must be >= 5"
-    @assert length(s) >= n "dataset must be >= than n"
+    @assert n >= 5 "n must be greater or equal 5"
+    @assert length(s) >= n "length(s) must be greater or equal to n"
 
     w = hmaSymmetricWeights(n)
     m = (n-1) ÷ 2
