@@ -7,7 +7,7 @@ version = "0.1.0"
 Dierckx = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
 
 [compat]
-julia = "1"
+julia = "1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
