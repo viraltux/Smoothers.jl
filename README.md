@@ -17,18 +17,21 @@ using Smoothers, Plots
 
 t = Array(LinRange(-pi,pi,100));
 x = sin.(t) .+ 0.25*rand(length(t));
-plot(t,x,label="sin(t)",linewidth=10,alpha=.3,title="w=21")
 
+# Data
 w = 21
+plot(t,x,label="sin(t)",linewidth=10,alpha=.3,
+     title="w="*string(w),legend=:bottomright)
+
 # Henderson Moving Average Filter
-plot!(t,hma(x,w), label ="hma(x,w)", legend=:bottomright)
+plot!(t,hma(x,w), label ="hma(x,w)")
 
 # Locally Estimated Scatterplot Smoothing
 plot!(t,loess(t,x;q=w)(t), label ="loess(t,x;q=w)(t)")
 
 # Moving Average Filter with Matlab/Octave 'filter'
 b = ones(w)/w; a = [1];
-plot!(t,filter(b,a,x), label ="filter(1,[1/w,...],x)", legend=:bottomright)
+plot!(t,filter(b,a,x), label ="filter(1,[1/w,...],x)")
 
 # Simple Moving Average
 plot!(t, sma(x,w,true), label = "sma(x,w,true)")
