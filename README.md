@@ -10,6 +10,31 @@ The package Smoothers provides a collection of smoothing heuristics, models and 
 
 <img src="./docs/src/images/smoothers.png">
 
+## Quick Examples
+
+```julia  
+using Smoothers, Plots
+
+t = Array(LinRange(-pi,pi,100));
+x = sin.(t) .+ 0.25*rand(length(t));
+plot(t,x,label="sin(t)",linewidth=10,alpha=.3,title="w=21")
+
+w = 21
+# Henderson Moving Average Filter
+plot!(t,hma(x,w), label ="hma(x,w)", legend=:bottomright)
+
+# Locally Estimated Scatterplot Smoothing
+plot!(t,loess(t,x;q=w)(t), label ="loess(t,x;q=w)(t)")
+
+# Moving Average Filter with Matlab/Octave 'filter'
+b = ones(w)/w; a = [1];
+plot!(t,filter(b,a,x), label ="filter(1,[1/w,...],x)", legend=:bottomright)
+
+# Simple Moving Average
+plot!(t, sma(x,w,true), label = "sma(x,w,true)")
+```
+<img src="./docs/src/images/smoothers_examples.png">
+
 ## References
 
 * [Cleveland et al. 1990]  Cleveland,  R.  B.;  Cleveland,  W.  S.;McRae, J. E.; and Terpenning, I.  1990.  STL: A seasonal-trend decomposition procedure based on loess. Journal of Official Statistics 6(1):3–73.
