@@ -1,6 +1,7 @@
 module Smoothers
 
 using Dierckx
+import Base: filter
 
 export filter, hma, loess, sma, stl
 
