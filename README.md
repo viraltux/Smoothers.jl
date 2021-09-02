@@ -12,29 +12,29 @@ The package Smoothers provides a collection of smoothing heuristics, models and 
 
 ## Quick Examples
 
-```julia  
+```julia
 using Smoothers, Plots
 
 t = Array(LinRange(-pi,pi,100));
 x = sin.(t) .+ 0.25*rand(length(t));
 
 # Data
-w = 21
-plot(t,x,label="sin(t)",linewidth=10,alpha=.3,
-     title="w="*string(w),legend=:bottomright)
+w = 21; sw = string(w)
+plot(t,x,label="sin(t)",linewidth=10,alpha=.3, xlabel = "t", 
+     title="Smoothers",legend=:bottomright)
 
 # Henderson Moving Average Filter
-plot!(t,hma(x,w), label ="hma(x,w)")
+plot!(t,hma(x,w), label ="hma(x,"*sw*")")
 
 # Locally Estimated Scatterplot Smoothing
-plot!(t,loess(t,x;q=w)(t), label ="loess(t,x;q=w)(t)")
+plot!(t,loess(t,x;q=w)(t), label ="loess(t,x;q="*sw*")(t)")
 
 # Moving Average Filter with Matlab/Octave 'filter'
 b = ones(w)/w; a = [1];
-plot!(t,filter(b,a,x), label ="filter(1,[1/w,...],x)")
+plot!(t,filter(b,a,x), label ="filter(1,[1/"*sw*",...],x)")
 
 # Simple Moving Average
-plot!(t, sma(x,w,true), label = "sma(x,w,true)")
+plot!(t, sma(x,w,true), label = "sma(x,"*sw*",true)")
 ```
 <img src="./docs/src/images/smoothers_examples.png">
 
