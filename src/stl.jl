@@ -22,6 +22,8 @@ for `no` the authors advise 5 ("safe value") or 10 ("near certainty of convergen
 
 for `qsmp` the authors do not advise a default but they use a value close to div(`np`,7).
 
+* STL: A Seasonal, Trend Decomposition Procedure Based on Loess" Robert B. Cleveland, William S. Cleveland, Jean E. McRae, and Irma Terpenning. Journal of Official Statistics Vol. 6. No. 1, 1990, pp. 3-73 (c) Statistics Sweden.
+
 # Arguments
 - `Yv`: Time series.
 - `np`: Seasonality.
@@ -38,9 +40,6 @@ for `qsmp` the authors do not advise a default but they use a value close to div
 
 # Returns
 A three columns matrix with the Seasonal, Trend and Remainder values for Yv.
-
-* STL: A Seasonal, Trend Decomposition Procedure Based on Loess" Robert B. Cleveland, William S. Cleveland, Jean E. McRae, and Irma Terpenning. Journal of Official Statistics Vol. 6. No. 1, 1990, pp. 3-73 (c) Statistics Sweden.
-
             
 # Examples
 ```julia-repl
