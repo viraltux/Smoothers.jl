@@ -3,8 +3,10 @@ using Smoothers
 
 @testset "loess" begin
 
+    # AssertionsErrors
     @test_throws AssertionError loess(rand(5),rand(5); d=3)
-    
+
+    # Standard
     fx = loess(sort(rand(10)),rand(10))
     x = fx(rand(20))
     @test length(x) == 20
