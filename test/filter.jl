@@ -4,21 +4,21 @@ import Smoothers: filter
 
 @testset "filter" begin
 
-    # Types' promotion
-    fx = filter(Float16.(b),Float16.(a),Float16.(x))
-    @test eltype(fx) == Float16
-    fx = filter(Float32.(b),Float32.(a),Float32.(x))
-    @test eltype(fx) == Float32
-    fx = filter(BigFloat.(b),BigFloat.(a),BigFloat.(x))
-    @test eltype(fx) == BigFloat
-    fx = filter(Float16.(b),Int32.(a),Float64.(x))
-    @test eltype(fx) == Float64
-
     # Moving Average Filter
     w = 3; 
     b = ones(w)/w;
     a = [1];
     x = [1,2,3,4,5];
+
+    # Types' promotion
+    fx = filter(Float16.(b),Float16.(a),Float16.(x));
+    @test eltype(fx) == Float16
+    fx = filter(Float32.(b),Float32.(a),Float32.(x));
+    @test eltype(fx) == Float32
+    fx = filter(BigFloat.(b),BigFloat.(a),BigFloat.(x));
+    @test eltype(fx) == BigFloat
+    fx = filter(Float16.(b),Int32.(a),Float64.(x));
+    @test eltype(fx) == Float64
 
     # Standard
     fx = filter(b,a,x)
