@@ -35,7 +35,7 @@ n = 1000
 x = sort(rand(n)*2*pi);
 y = sin.(x) + randn(n);
 f = Smoothers.loess(x,y)
-#f(π) ≈ 0.0
+isapprox(f(pi),0;atol=0.1)
 [...]
 ```
 """
@@ -74,17 +74,12 @@ function loess(xv::AbstractVector{R},
     length(xv) == 1 && return x -> repeat([yv[1]],length(x))
     length(xv) == 2 && begin d=(yv[2]-yv[1])/(xv[2]-xv[1]); return x -> @. d*x+(yv[1]-d*xv[1]) end
     
-    # Promote to same type
-    P = promote_type(R,T)
-    P = Base.promote_op(/,P,P)
-
-    xv = R == P ? xv :  P.(xv)
-    yv =  P.(yv)
-    rho = P.(rho)
-    exact = P.(exact)
+    # Promote to same Float type
+    xv,yv,rho,exact,_ = Base.promote(xv,yv,rho,exact,[Base.promote_op(/,T,T)(1.0)])
     
     ## Ax = b prediction
-    A = hcat(xv,fill(P(1),length(xv)))
+    P = eltype(xv)
+    A = hcat(xv,fill(P(1.0),length(xv)))
     b = yv
 
     ## Order Estimation
@@ -97,12 +92,12 @@ function loess(xv::AbstractVector{R},
         N = length(xv)
         n = 2*sr(N)*N÷q
         m,M = extrema(xv)
-        gap = (M-m)/n
+        gap = P((M-m)/n)
         #exact = vcat(exact, xv[Int64.(round.(LinRange(1,length(xv),20)))])
         predict = sort(unique(vcat(collect(m:gap:M),M,extra)))
-        predictx = vcat(m-P(10)*gap,m-gap,
+        predictx = vcat(m-P(10.0)*gap,m-gap,
                         predict,
-                        M+gap,M+P(10)*gap)
+                        M+gap,M+P(10.0)*gap)
     else
         @assert length(exact) > d "length(exact) should be greater than d"
     end

@@ -20,7 +20,7 @@ x = sin.(t) .+ 0.25*rand(length(t));
 
 # Data
 w = 21; sw = string(w)
-plot(t,x,label="sin(t)",linewidth=10,alpha=.3,
+plot(t,x,label="sin(t)+ϵ",linewidth=10,alpha=.3,
      xlabel = "t", ylabel = "x",
      title="Smoothers",legend=:bottomright)
 
