@@ -59,13 +59,17 @@ julia> hma(rand(1000), BigInt(303)))
 [...]
 ```
 """
-function hma(s::AbstractVector{<:T}, n::Integer) where T<:Real
+@inline function hma(s::AbstractVector{<:T}, n::Integer) where T<:Real
 
     @assert isodd(n) "n must be odd"
     @assert n >= 5 "n must be greater or equal 5"
     @assert length(s) >= n "length(s) must be greater or equal to n"
 
-    w = hmaSymmetricWeights(n,T)
+    # Promote to equivalent in size T Integer type andd Float type
+    n = typeof(Integer(T(1.0)))(n)
+    s,_ = Base.promote(collect(s),[Base.promote_op(/,T,T)(1.0)])
+    
+    w = hmaSymmetricWeights(n)
     
     m = (n-1) ÷ 2
     ls = length(s)
@@ -82,15 +86,32 @@ function hma(s::AbstractVector{<:T}, n::Integer) where T<:Real
         end
     end
     
-    map(x -> hmai(x), 1:ls)
+    hmav = similar(s)
+    for i in 1:ls
+        @inbounds hmav[i] = hmai(i)
+    end
+    hmav
+    
 end
 
-# Henderson symmetric weights
+"""
+package: Smoothers
 
-# Derive an n-term array of symmetric 'Henderson Moving Average' weights
-# formula from ABS (2003), 'A Guide to Interpreting Time Series', page 41.
-# returns a numpy array of symmetric Henderson weights indexed from 0 to n-1
-function hmaSymmetricWeights(n::Integer,T::DataType)
+    hmaSymmetricWeights(n,T)
+
+Caluclate the hma symmetric weights for 'n'
+
+# Arguments
+- `n`: Number of symmetric weights
+
+# Returns
+
+ Vector of symmetrical hma weights with type related to the bit size of `n`
+
+# Refenrences
+- "A Guide to Interpreting Time Series" ABS (2003), page 41.
+"""
+@inline function hmaSymmetricWeights(n::T) where T<:Integer
 
     m = (n-1)÷2
     m1 = (m+1)^2
@@ -98,33 +119,61 @@ function hmaSymmetricWeights(n::Integer,T::DataType)
     m3 = (m+3)^2
     d = 315/(8*(m+2)*(m2-1)*(4*m2-1)*(4*m2-9)*(4*m2-25))
 
-    w = map(x -> (m1-x^2)*(m2-x^2)*(m3-x^2)*(3*m2-11*x^2-16)*T(d), 0:m+1)
+    P = Base.promote_op(/,T,T)
+    w = Vector{P}(undef,m+2)
+    m,m1,m2,m3,d = promote(m,m1,m2,m3,d,P(1.0))
+
+    for (i,x) in enumerate(0:m+1)
+        @inbounds w[i] = (m1-x^2)*(m2-x^2)*(m3-x^2)*(P(3.0)*m2-P(11.0)*x^2-P(16.0))*d
+    end
     u = vcat(w[end-1:-1:1],w[2:end-1])
 
     return mod(n, 2) != 0 ? u : vcat(u, missing)
 
 end
 
-# Calculate the asymmetric end-weights
-# w --> an array of symmetrical henderson weights (from above function)
-# m --> the number of asymmetric weights sought; where m < len(w);
-# returns a numpy array of asymmetrical weights, indexed from 0 to m-1;
-# formula from Mike Doherty (2001), 'The Surrogate Henderson Filters in X-11',
-# Aust, NZ J of Stat. 43(4), 2001, pp901-999; see formula (1) on page 903
-function hmaAsymmetricWeights(m::Integer, w::AbstractVector{<:T}) where T<:Real
+"""
+package: Smoothers
+
+    hmaAsymmetricWeights(m,w)
+
+Calculate the hma asymmetric end-weights for 'm' given 'w'
+
+# Arguments
+- `m`: Number of asymmetric weights (m < length(w))
+- `w`: Vector of symmetrical hma weights
+
+# Returns
+
+Vector of asymmetrical hma weights
+
+# References
+
+- Mike Doherty (2001), "The Surrogate Henderson Filters in X-11",Aust, NZ J of Stat. 43(4), 2001, 385–392
+"""
+@inline function hmaAsymmetricWeights(m::Integer, w::AbstractVector{<:T}) where T<:Real
 
     n = length(w)
 
     @assert m <= n "The m argument must be less than w"
     @assert m >= (n-1)÷2 "The m argument must be greater than (n-1)/2"
 
-    sumResidual = sum(w[range(m + 1, n, step = 1)]) / m
-    sumEnd =  sum(map(x -> (x-(m+T(1.0))/T(2.0))*w[x], m+1:n))
-
+    sumResidual = sum(w[range(m + 1, n, step = 1)]) / T(m)
+    
+    sumEnd = T(0.0)
+    for i in m+1:n
+        @inbounds sumEnd += (i-(m+T(1.0))/T(2.0))*w[i]
+    end
+    
     ic = n < 13 ? T(1.0) : (13 <= n < 15 ? T(3.5) : T(4.5))
     
     b2s2 = T(4.0)/T(pi)/ic^2
     denominator = T(1.0) + ((m*(m-T(1.0))*(m+T(1.0)) / T(12.0) ) * b2s2)
-    map(r -> w[r] + sumResidual + (((r+T(1.0)) - (m+T(1.0))/T(2.0)) * b2s2) / denominator * sumEnd, 1:m)
-                                  
+
+    aw = Vector{T}(undef,m)
+    for r in 1:m
+        numerator = (T(r) - (m+T(1.0)) / T(2.0)) * b2s2
+        @inbounds aw[r] = w[r] + sumResidual +  numerator / denominator * sumEnd
+    end
+    aw
 end
