@@ -18,7 +18,6 @@ using Smoothers, Plots
 t = Array(LinRange(-pi,pi,100));
 x = sin.(t) .+ 0.25*rand(length(t));
 
-
 # Data
 w = 21; sw = string(w)
 plot(t,x,label="sin(t)+ϵ",linewidth=10,alpha=.3,
