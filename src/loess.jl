@@ -55,7 +55,7 @@ function loess(xv::AbstractVector{R},
                yv::AbstractVector{<:Union{Missing,T}};
                d::Integer=0,
                q::Integer=3*length(yv)÷4,
-               rho::AbstractVector{<:Union{Missing,T}}=fill(T(1),length(xv)),
+               rho::AbstractVector{<:Union{Missing,T}}=fill(T(1.0),length(xv)),
                exact::AbstractVector{R}=R[],
                extra::AbstractVector{R}=R[]) where {R<:Real,T<:Real}
 
@@ -68,7 +68,7 @@ function loess(xv::AbstractVector{R},
     @assert length(myi) > 0 "at least one yv value must be non missing"
     q = Int(floor(q*length(myi)/length(yv)))
     xv = xv[myi]
-    yv = yv[myi]
+    yv = Vector{T}(yv[myi])
     rho = rho[myi]
 
     length(xv) == 1 && return x -> repeat([yv[1]],length(x))
