@@ -71,6 +71,9 @@ function loess(xv::AbstractVector{R},
     yv = Vector{T}(yv[myi])
     rho = rho[myi]
 
+    exact = collect(exact)
+    extra = collect(extra)
+        
     length(xv) == 1 && return x -> repeat([yv[1]],length(x))
     length(xv) == 2 && begin d=(yv[2]-yv[1])/(xv[2]-xv[1]); return x -> @. d*x+(yv[1]-d*xv[1]) end
     
