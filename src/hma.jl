@@ -61,7 +61,14 @@ julia> hma(rand(1000), 303)
 """
 @inline function hma(x::AbstractVector{<:T}, n::Integer) where T<:Real
 
-    @assert isodd(n) "n must be odd"
+    if !isodd(n)
+        @warn "Henderson moving averages only accepts odds values for 'n';\nreturning instead the average of hma(x,"*string(n)*"-1) and hma(x,"*string(n)*"+1)"
+               
+        hma1 = hma(x,n-1)
+        hma2 = hma(x,n+1)
+        return (hma1 + hma2) / 2
+    end
+    
     @assert n >= 5 "n must be greater or equal 5"
     @assert (lx = length(x)) >= n "length(s) must be greater or equal to n"
 
