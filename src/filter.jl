@@ -49,7 +49,9 @@ plot!(t,y2,label="MA with si")
                         ) where {A<:Real,B<:Real,C<:Real,D<:Real}
 
     @assert a[1] != 0 "a[1] must not be zero"
-    a,b,x,si,_ = Base.promote(a,b,x,si,[Base.promote_op(/,B,A)(1.0)])
+
+    T = Base.promote_op(/,B,A)
+    a,b,x,si,_ = Base.promote(a,b,x,si,[T(1.0)])
     
     Na,Nb,Nx = length(a),length(b),length(x)
     Nsi = max(Na,Nb)-1
@@ -57,18 +59,18 @@ plot!(t,y2,label="MA with si")
     
     N,M = Na-1,Nb-1
     c,d = a/a[1],b/a[1]
-
-    T = eltype(x)
+    
     y = zeros(T,Nx)
     y[1:Nsi] = si
 
     for n in 1:Nx
-        for k in 0:M
-            @inbounds y[n] += n-k > 0 ? d[k+1]*x[n-k] : T(0.0)
+        for k in 0:min(n-1,M)
+            @inbounds y[n] += d[k+1]*x[n-k]
         end
-        for k in 1:N
-            @inbounds y[n] -= n-k > 0 ? c[k+1]*y[n-k] : T(0.0)
+        for k in 1:min(n-1,N)
+            @inbounds y[n] -= c[k+1]*y[n-k]
         end
     end
-    y
+    
+    return y
 end
