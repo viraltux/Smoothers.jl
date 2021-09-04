@@ -69,7 +69,7 @@ julia> hma(rand(1000), 303)
     P = Base.promote_op(/,T,T)
     x,_ = Base.promote(collect(x),[P(1.0)])
 
-    w = P.(hmaSymmetricWeights(n))
+    w = hmaSymmetricWeights(n,P)
     
     m = (n-1) ÷ 2
 
@@ -99,7 +99,7 @@ end
 """
 package: Smoothers
 
-    hmaSymmetricWeights(n,T)
+    hmaSymmetricWeights(n,P)
 
 Caluclate the hma symmetric weights for 'n'
 
@@ -113,18 +113,16 @@ Caluclate the hma symmetric weights for 'n'
 # Refenrences
 - "A Guide to Interpreting Time Series" ABS (2003), page 41.
 """
-@inline function hmaSymmetricWeights(n::T) where T<:Integer
+@inline function hmaSymmetricWeights(n::Integer,P::DataType) 
 
-    m = (n-1)÷2
+    m = (P(n)-1)÷2
     m1 = (m+1)^2
     m2 = (m+2)^2
     m3 = (m+3)^2
     logd = log(m+2)+log(m2-1)+log(4*m2-1)+log(4*m2-9)+log(4*m2-25)
     d = 315/(8*exp(logd))
     
-    P = Base.promote_op(/,T,T)
-    w = Vector{P}(undef,m+2)
-    m,m1,m2,m3,d = promote(m,m1,m2,m3,d,P(1.0))
+    w = Vector{P}(undef,Int(m)+2)
     for (i,v) in enumerate(0:m+1)
          @inbounds w[i] = real(exp(log(m1-v^2)+log(m2-v^2)+log(m3-v^2)+
                                log(complex(P(3.0)*m2-P(11.0)*v^2-P(16.0)))+log(d)))

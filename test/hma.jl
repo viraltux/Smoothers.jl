@@ -15,13 +15,13 @@ import Smoothers: hmaSymmetricWeights
     @test eltype(fx) == Float64
     
     # weights
-    w = hmaSymmetricWeights(8)
+    w = hmaSymmetricWeights(8,Float64)
     @test ismissing(w[end])
 
-    w = hmaSymmetricWeights(7)
+    w = hmaSymmetricWeights(7,Float64)
     @test sum(w) ≈ 1.0
 
-    w = hmaSymmetricWeights(13)
+    w = hmaSymmetricWeights(13,Float64)
     @test sum(w) ≈ 1.0
     # (https://www.mathworks.com/help/econ/seasonal-adjustment-using-snxd7m-seasonal-filters.html)
     @test length(w) == 13
