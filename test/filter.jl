@@ -26,7 +26,6 @@ import Smoothers: filter
     @test fx[1:2] ≈ [1/3,1]
     @test fx[3:5] ≈ sma(x,3)
 
-
     # Initial State
     si = [1/3,1]
     fx = filter(b,a,x,si)
