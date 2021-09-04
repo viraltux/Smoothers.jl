@@ -17,7 +17,7 @@ import Smoothers: filter
     @test eltype(fx) == Float32
     fx = filter(BigFloat.(b),BigFloat.(a),BigFloat.(x));
     @test eltype(fx) == BigFloat
-    fx = filter(Float16.(b),Int32.(a),Float64.(x));
+    fx = filter(Float16.(b),Int32.(a),Float64.(x))
     @test eltype(fx) == Float64
 
     # Standard

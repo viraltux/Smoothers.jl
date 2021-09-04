@@ -50,7 +50,7 @@ plot!(t,y2,label="MA with si")
 
     @assert a[1] != 0 "a[1] must not be zero"
 
-    T = Base.promote_op(/,B,A)
+    T = Base.promote_op(/,C,Base.promote_op(/,B,A))
     a,b,x,si,_ = Base.promote(a,b,x,si,[T(1.0)])
     
     Na,Nb,Nx = length(a),length(b),length(x)
