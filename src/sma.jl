@@ -1,8 +1,7 @@
 """
 Package: Smoothers
 
-    sma(x, n)
-    sma(x, n, center)
+    sma(x, n, center=false)
 
 Smooth a vector of data using a simple moving average
 

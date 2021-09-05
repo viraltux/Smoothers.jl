@@ -3,7 +3,7 @@
 The package Smoothers provides a collection of smoothing heuristics, models and smoothing related applications. The current available smoothers and applications are:
 
 * Henderson Moving Average Filter (**hma**)
-* Linear Time-invariant Difference Equation Filter (**filter**)
+* Linear Time-invariant Difference Equation Filter — Matlab/Octave (**filter**)
 * Locally Estimated Scatterplot Smoothing (**loess**)
 * Seasonal and Trend decomposition based on Loess (**stl**) 
 * Simple Moving Average (**sma**)

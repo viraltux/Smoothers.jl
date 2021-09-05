@@ -27,7 +27,7 @@ Package: Forecast
 
     hma(x, n)
 
-Applies the Henderson moving average filter to dataset `s` with `n`-term.
+Applies the Henderson moving average filter to dataset `x` with `n`-term.
 
 "Henderson moving averages are filters which were derived by Robert Henderson in 1916 
 for use in actuarial applications. They are trend filters, commonly used in time series 

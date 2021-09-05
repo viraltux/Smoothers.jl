@@ -7,6 +7,12 @@ Package: Forecast
           rho = fill(1.0,length(yv)),
           exact = [], extra = [])
 
+    loess(yv;
+          d = 0,
+          q = 3*sum((!ismissing).(yv))÷4,
+          rho = fill(1.0,length(yv)),
+          exact = [], extra = [])
+
 Return a funcion to smooth a vector of observations using locally weighted regressions.
 
 Although loess can be used to smooth observations for any given number of independent variables, this implementation is univariate. The speed of loess can be greatly increased by using fast aproximations for the linear fitting calculations, however this implementation calculates allows as well for exact results.
@@ -18,7 +24,7 @@ Robert B. Cleveland, William S. Cleveland, Jean E. McRae, and Irma Terpenning.
 Journal of Official Statistics Vol. 6. No. 1, 1990, pp. 3-73 (c) Statistics Sweden.
 
 # Arguments
-- `xv`: Observations' support.
+- `xv`: Observations' support, if not provided 1:length(yv) is used instead.
 - `yv`: Observation values.
 - `d`: Degree of the linear fit, it accepts values 0, 1 or 2, if 0 an estimation of `d` is calculated.
 - `q`: As q increases loess becomes smoother, when q tends to infinity loess tends to an ordinary least square poynomial fit of degree `d`. It defaults to the rounding of 3/4 of xv's non-missing values length.
