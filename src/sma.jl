@@ -36,13 +36,13 @@ julia> sma(1:5,3,true)
     N = length(x)
     @assert 1 <= n <= N
     
-    V = Base.promote_op(/, T, T)
-    res = Vector{V}(undef, N-n+1)
+    P = Base.promote_op(/, T, T)
+    res = Vector{P}(undef, N-n+1)
     
     # initial moving average value
     res[1] = ma = sum(x[1:n])/n
     for i in 1:N-n
-        @inbounds res[1+i] = ma += (x[n+i] - x[i]) / V(n)
+        @inbounds res[1+i] = ma += (x[n+i] - x[i]) / P(n)
     end
 
     center ? vcat(repeat([missing], n÷2),res,repeat([missing], n-n÷2-1)) : res
