@@ -42,7 +42,7 @@ plot!(t, sma(x,w,true), label = "sma(x,"*sw*",true)")
 
 ## References
 
-* [Cleveland et al. 1990]  Cleveland,  R.  B.;  Cleveland,  W.  S.;McRae, J. E.; and Terpenning, I.  1990.  STL: A seasonal-trend decomposition procedure based on loess. Journal of Official Statistics 6(1):3–73.
+* [Cleveland et al. 1990] Cleveland, R. B.; Cleveland, W. S.; McRae, J. E.; and Terpenning, I. 1990.  STL: A seasonal-trend decomposition procedure based on loess. Journal of Official Statistics 6(1):3–73.
 * Henderson, R. (1916). Note on graduation by adjusted average. Transactions of the Actuarial Society of America, 17:43-48. [Australian Bureau of Statistics: What Are Henderson Moving Averages?](https://www.abs.gov.au/websitedbs/d3310114.nsf/4a256353001af3ed4b2562bb00121564/5fc845406def2c3dca256ce100188f8e!OpenDocument#:~:text=WHAT%20ARE%20HENDERSON%20MOVING%20AVERAGES%3F)
 * Octave Forge: [filter function](https://octave.sourceforge.io/octave/function/filter.html)
 

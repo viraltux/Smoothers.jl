@@ -80,7 +80,7 @@ function stl(Yv::AbstractVector{<:Union{Missing,T}},
     Cv = Vector{T}(undef,N+2*np)
     scnv = false # seasonal convergence flag
     tcnv = false # trend convergence flag
-    #for o in 0:no
+
     o = 0
     while robust | (o <= no)
         for k in 1:ni
