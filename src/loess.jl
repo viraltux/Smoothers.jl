@@ -157,13 +157,22 @@ end
 sr(n) = Int(round(1+3.322*log(n)))
 
 # absolute standard deviation
+function astd(x::AbstractVector{<:Union{Missing,Real}})
+    astd(collect(skipmissing(x)))
+end
+
 function astd(x::AbstractVector{<:Real})
     n = length(x)
     sum(abs.(x.-sum(x)/n))/n
 end
 
+
 # k order estimation for Splines
-function khat(y)
+function khat(y::AbstractVector{<:Union{Missing,Real}})
+    khat(collect(skipmissing(y)))
+end
+
+function khat(y::AbstractVector{<:Real})
     dy = diff(y); ady = astd(dy)
     ady < 1e-10 && return 1
     mi = 1
