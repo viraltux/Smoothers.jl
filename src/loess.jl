@@ -53,7 +53,7 @@ function loess(yv::AbstractVector{<:Union{Missing,T}};
                q::Integer=3*length(yv)÷4,
                rho::AbstractVector{<:Union{Missing,T}}=fill(T(1),length(yv)),
                exact::AbstractVector{T}=T[],
-               extra::AbstractVector{T}=T[]) where {T<:Real,S<:Real}
+               extra::AbstractVector{T}=T[]) where {T<:Real}
 
     loess(T(1):length(yv),yv;d,q,rho,exact,extra)
 end
